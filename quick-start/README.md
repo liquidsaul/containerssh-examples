@@ -37,3 +37,32 @@ Once you're done, you can shut down the server using the `docker-compose down`, 
 The authentication and configuration server included in the example is a dummy server and lets any password in. To actually use ContainerSSH, you will have to write [your own authentication server](https://containerssh.io/getting-started/authserver/). We recommend reading the [architecture overview](https://containerssh.io/getting-started/architecture/) before proceeding.
 
 **👉 Tip:** You can pass the `CONTAINERSSH_ALLOW_ALL` environment variable to the demo auth-config server to build a honeypot.
+
+# Kubernetes
+
+## Simple
+
+```
+kubectl apply -f kubernetes.yaml
+```
+
+## Helm
+
+Note: Currently broken due to difficulty parsing the config.yaml as a volume
+
+The HELM chart is supposed to assist in automating and templating your containerSSH deployment.
+
+Check out the `values.yaml` to see what you can configure, you don't need to touch the templates.
+
+Make sure to create the `containerssh-guests` and `containerssh` namespaces before running the helm install command.
+
+If you're coming from the simple install, please uninstall this first.
+
+`kubectl delete -f kubernetes.yaml`
+
+`kubectl create ns containerssh-guests`
+`kubectl create ns containerssh-guests`
+
+```helm install -n containerssh containerssh ./containerssh -f ./containerssh/values.yaml --create-namespace --debug```
+
+

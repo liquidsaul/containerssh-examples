@@ -1,0 +1,181 @@
+# Default values for containerssh.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+host:
+  name: containerssh
+  namespace: containerssh
+  replicaCount: 2
+  serviceAccountName: containerssh
+
+  labels:
+      app: containerssh
+  podSecurityContext: {}
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  
+  sidecar_authserver: 
+    create: true
+    name: containerssh-authconfig
+    image: containerssh/containerssh-test-authconfig:0.4
+    securityContext:
+      readOnlyRootFilesystem: true
+
+  image:
+    repository: containerssh/containerssh:0.4
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  port:
+    name: ssh
+    containerPort: 2222
+    protocol: tcp
+  volumeMounts:
+      # Mount the host key
+    - name: hostkey
+      mountPath: /etc/containerssh/host.key
+      subPath: host.key
+      readOnly: true
+      # Mount the config file
+    - name: config
+      mountPath: /etc/containerssh/config.yaml
+      subPath: config.yaml
+      readOnly: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# guests:
+#   namespace: "containerssh-guests"
+#   images:
+#   - name: base-guest
+#     image:
+#       repository: containerssh/containerssh-guest-image
+#       pullPolicy: IfNotPresent
+#       # Overrides the image tag whose default is the chart appVersion.
+#       tag: ""
+#     resources:
+#       limits:
+#         cpu: 100m
+#         memory: 128Mi
+#       requests:
+#         cpu: 100m
+#         memory: 128Mi
+#     security:
+#       securityContext:
+#         capabilities:
+#           drop:
+#           - ALL
+#         readOnlyRootFilesystem: true
+#         runAsNonRoot: true
+#         runAsUser: 1000  
+
+config_file:
+   path: "config.yaml"
+
+secrets:
+  env: 
+    create: false
+  ssh:
+    create: true
+    hostkey:
+      name: containerssh-hostkey
+      key: |-
+        LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBeFhJVGFXR25FY2UvN2M2RzQwR3Iya3JkOGVJWGJZSzJ4ZWVXN1d4TDczd2hrdFloCmw1YWRSS0ZxeEJtYmFKcjhBdGtSZTRFZk9pNEpOdzB3aGE3amQ2YUdwWHFPb0VUTEtTUmZLTWYyUmwvT3BKQkIKdkFycWlPRFZqc2pqUStwM24wWDF1cTNOaEhvR3l3OXNDS1cwRXgvRnRWVjN2R29VTTNoWGdxcTZjUmhuaEprYgo0dEtOWkdvekVTc1l5a08wUEtvSHRnejkrRnU3dFhjbTExQkN4TEFGMGxOSU43emFzY0hqT0xVRTBLOGhEMFROCjlERkJQa3hvemNwQWNWSzMwQmttYlN6eW1EbjdpSDJrTTFNL0JpZThQT0ZQaXZDbmI0N2JkaEs5ZDk1Z2V5UkUKTTRoNE1pcDhhamFuU3IwUXRJSUUxV3Z1aFB5TkJQWVByRS90V3dJREFRQUJBb0lCQVFDQ2g1M3BweE5LSCtIMApsdnA1dHVxano2Yld4Lzl3K0Y5WWluZ3UwYytKcldpTXFGOWcxY04yb2JmeG1IUXpQWEtwZDFPbGNJRnlkd2pFCmlrV3Z1eVRKN3g5SXVyTWJwUjhpUGRkaklIN2htMmtEUmhNTys3QjllUlgxNVR6Sm8zSWRxNlIrRzNTb3hmdEQKdHhoV3h5VTdGMkFmTnplSEtpSGN2UXd0YUMwRm9sQ1BCUnJWbms2ZDkxRERUOFV2a1c1ZGkzczlvcC9BTUFTbAoxRExXRHloK0ErdzViVEFWQzJYc0xmd1ZlSXlGdXpMVzNUTkNaWmNGamNvcktVMmQ3ZjFtd1pSbktEaWVBUWp3Ck9rQ2xIM0xxRnN2OHNvbDQ1Sk9zMTFWNUFpVXpFaUJpWnZ1UWtiaTcyWXVHMGh6NHFNR0plYXA0K0VXZFZFWHoKMzU2VWZhK1JBb0dCQVBIWHZkemFuM3l4ODFqT1NqUzNVd2ZURU0xTlB1SldQVmZEV0RNSEx4TTNPUDVDc2IyTApXSHdWSDg2WU8xdC9UR0pkbXJDTzJ1NWNOL0srR3MxWjJSYkdSM2U3M2NkOStYZjl3WmpBaVBWTlRKQVRUR25PCmE2SkhaaEgzaUFlRmU4dkx6SUxCeTVBd1UxdUsvM2graVRBVldZdTNiTHZWZC9JTzNYWWdZMGsvQW9HQkFORUEKLzRuTDNXOWdXNFBCR01qQmo5MnBYYllQVmlRNFA0VjhBMUhGZ1g2Q2FjcnJCN2U3VWd3Q3hYWFQrOFZWMUtrKwp2WDZlcnBSVk5qK3NDMVpEQmtXT09pRWd1RWtMNVZ4Y0hxZlg1akJJTU44cDBKd1IrSWdlM1duNDdNZ3ZpRDc3CmJVWjVxT2RQLzdhR2J3VnJvZkdCNUNJc1JKTU1BMmo4Rnd5TmZwamxBb0dBRTZadzhkbjlyWGNVQzdvdlExdEYKN3RQU2dLdnZHUnJpdnhmTE9kSXluQUFYckdrazRmN0pnTU9Db3hteGNQekY2eFFwOW9DVS8xc1UzSzlmcENIUgp4c3p6ajZIL0lpOTFMcSs2cER1NHBSM1R3NzBkcjFjclhiTXBjdnBHM2oyVlVuakx0REFrNXlGV0ZKRVZzdWV0CkkvQUlKNWNPeWJCTm42aGZqREtUZnFjQ2dZRUFzbnNsdmVqb2VwcFF6Rnp6NjB6UXJMeGJtSVBVVGkzeW9PMWMKY0ZJMzJXOUpKTTQ4MHZ3V2ZzZEhGTzRvVFVhVXlzc1hTNi82NmhVeXRJRVpWVnI3V2g2eEtXVWx1c3Q3M0xtVwpQRU0xQWZwRU1lOGxoSUljT1RJU1p0TDZjYUdWdWlOQUdEVUF0amdzNlJRNGJ1cVJhd28vWmFka0VDYnNLcFZNCm9aMmJoTGtDZ1lBV1ZKU29tSW5XOXJ3eDF0bU1rODhXcVBYMGVJTllYK05PRE1EbjJrMlhTVzc5dVBsQUlqM3EKSkF0dXZsdmtlYm04NXlCUHllSEZiSkZTdlM2bzJIdmt5WGVnTjFZTWJjL1BmaFlKZmNQL2NlSTRkOGRFZndNWQpScDQyM2dqNFZsdnVac25PTGhJWEtlaVpVQnp3MXk0U1R0eWF2Tk1ieGU2WnZMSzNGeGxnTXc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQ==
+
+networkPolicy:
+  name: containerssh-guest-policy
+  namespace: containerssh-guests
+  spec:
+    podSelector: {}
+    policyTypes:
+      - Ingress
+      - Egress
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  name: containerssh
+  namespace: containerssh
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  automountServiceAccountToken: true
+
+role:
+  name: containerssh
+  namespace: containerssh-guests
+  rules:
+    - apiGroups:
+        - ""
+      resources:
+        - pods
+        - pods/logs
+        - pods/exec
+      verbs:
+        - '*'
+
+rolebinding:
+  name: containerssh
+  namespace: containerssh-guests
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: Role
+    name: containerssh
+  subjects:
+    - kind: ServiceAccount
+      name: containerssh
+      namespace: containerssh
+
+podAnnotations: {}
+
+service:
+  type: LoadBalancer
+  port: 22
+  
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

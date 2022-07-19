@@ -1,0 +1,34 @@
+# Let's log on the debug level so we can see what's going on.
+log:
+  level: debug
+ssh:
+  hostkeys:
+    # This points to the host key we will create in the next step.
+    - /etc/containerssh/host.key
+auth:
+  # The authentication server will be running in the same pod, so we use 127.0.0.1
+  url: http://127.0.0.1:8080
+# We run the guest containers in the same Kubernetes cluster as ContainerSSH is running in
+backend: kubernetes
+kubernetes:
+  connection:
+    host: kubernetes.default.svc
+    cacertFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  pod:
+    metadata:
+      namespace: containerssh-guests
+    spec:
+      containers:
+        - name: shell
+          image: containerssh/containerssh-guest-image
+          ## Further options to lock down the execution.
+          ## See https://containerssh.io/reference/kubernetes/ for mre options
+          #
+          # securityContext:
+          #    runAsNonRoot: true
+          #    runAsUser: 1000
+          # resources:
+          #   limits:
+          #     memory: "128Mi"
+          #     cpu: "500m"

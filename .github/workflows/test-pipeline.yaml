@@ -1,0 +1,12 @@
+name: Test Helm Chart
+on: 
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hello World
+        shell: bash
+        run: |
+          echo "Hello World"

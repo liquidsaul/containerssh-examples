@@ -44,5 +44,9 @@ runs:
       run: |
         kubectl create namespace containerssh
         helm upgrade --install containerssh ./quick-start/helm/containerssh -n containerssh
-        helm test containerssh -n containerssh
-    
+    - name: Test Helm Chart
+      shell: bash
+      run: |
+        sleep 30
+        kubectl get svc -n containerssh containerssh-svc -o jsonpath='{.spec.clusterIP}'
+        helm test containerssh -n containerssh    

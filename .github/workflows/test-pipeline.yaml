@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  End2EndHelmTest:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

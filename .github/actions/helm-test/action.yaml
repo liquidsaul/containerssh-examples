@@ -1,4 +1,4 @@
-name: 'helm install'
+name: 'Helm Chart Test'
 description: 'Install a given helm chart'
 
 runs:

@@ -44,5 +44,5 @@ runs:
       run: |
         kubectl create namespace containerssh
         helm upgrade --install containerssh ./quick-start/helm/containerssh -n containerssh
-        helm test containerssh
+        helm test containerssh -n containerssh
     

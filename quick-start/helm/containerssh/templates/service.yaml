@@ -1,8 +1,7 @@
-{{ define "containerssh.service" }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "containerssh.fullname" . }}
+  name: {{ include "containerssh.fullname" . }}-svc
   labels:
     {{- include "containerssh.labels" . | nindent 4 }}
   namespace: {{ include "containerssh.namespace" . }}
@@ -15,4 +14,3 @@ spec:
       protocol: TCP
   selector:
     {{- include "containerssh.selectorLabels" . | nindent 4 }}
-{{- end }}

@@ -8,8 +8,12 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args: ['{{ include "containerssh.fullname" . }}:{{ .Values.service.port }}']
+    - name: sshtest
+      image: nicolaka/netshoot
+      command: ['ssh']
+      args: 
+      - -oStrictHostKeyChecking=no
+      - -oHostKeyAlgorithms=ssh-rsa
+      - foo@containerssh-svc.containerssh.svc
+      - ls
   restartPolicy: Never
